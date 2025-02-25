@@ -1,31 +1,37 @@
-Scheleton for the Hub implementation.
+Data Link Layer Switch Implementation
 
-## Running
+This program implements a data link layer switch using a C-based shared library (dlink.so) for handling raw Ethernet frames. It provides functions for initializing the switch, sending, and receiving frames across network interfaces using ctypes for C-Python interoperability. This implementation allows direct communication at the data link layer, making it suitable for packet forwarding, VLAN processing, and custom network switching.
 
-```bash
-sudo python3 checker/topo.py
-```
+Features
 
-This will open 9 terminals, 6 hosts and 3 for the switches. On the switch terminal you will run 
+Switch Initialization (init()): Initializes the switch by parsing command-line arguments and returns the number of available network interfaces. This function ensures that the library is correctly loaded and that the network interfaces are ready for frame transmission and reception.
 
-```bash
-make run_switch SWITCH_ID=X # X is 0,1 or 2
-```
+Frame Reception (recv_from_any_link()): Listens for Ethernet frames on any network interface and returns the received data along with the frame length. This function enables the switch to process incoming traffic dynamically.
 
-The hosts have the following IP addresses.
-```
-host0 192.168.1.1
-host1 192.168.1.2
-host2 192.168.1.3
-host3 192.168.1.4
-host4 192.168.1.5
-host5 192.168.1.6
-```
+Frame Transmission (send_to_link()): Sends an Ethernet frame to a specified network interface, ensuring direct frame forwarding based on predefined rules or switching logic.
 
-We will be testing using the ICMP. For example, from host0 we will run:
+MAC Address Retrieval (get_switch_mac()): Extracts the MAC address of the switch by querying the first available network interface. This is useful for managing VLANs and implementing MAC-based filtering.
 
-```
-ping 192.168.1.2
-```
+Interface Name Retrieval (get_interface_name()): Retrieves the name of a given network interface, aiding in debugging and dynamic network configuration.
 
-Note: We will use wireshark for debugging. From any terminal you can run `wireshark&`.
+Implementation Details
+
+ctypes-based C Library Integration: Uses Python’s ctypes to call C functions from dlink.so, enabling efficient low-level networking operations.
+
+Raw Socket Communication: Works directly with Ethernet frames, bypassing higher-layer protocols to allow precise packet manipulation and forwarding.
+
+Memory Management & Safety: Ensures safe buffer handling using ctypes.create_string_buffer and proper memory allocation techniques to prevent overflows.
+
+Multi-Interface Support: Allows handling multiple network interfaces, making it adaptable for advanced switching mechanisms.
+
+Synchronized Transmission & Reception: Provides real-time frame processing to maintain network integrity and prevent packet loss.
+
+Use Cases
+
+This implementation is ideal for:
+
+Custom Network Switching: Enables the development of software-defined networking (SDN) applications.
+
+VLAN Management: Can be extended to support VLAN tagging and filtering.
+
+Packet Monitoring & Filtering: Provides direct access to raw Ethernet frames for traffic analysis and network security applications.
